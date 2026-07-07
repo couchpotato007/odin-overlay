@@ -19,10 +19,11 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - uses: cachix/cachix-action@v15
+      - uses: cachix/install-nix-action@v27
         with:
-          name: nixpkgs
-        continue-on-error: true
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+          nix_path: nixpkgs=channel:nixos-unstable
 
       - name: Update versions.nix
         run: ./update.sh
