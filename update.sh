@@ -1,5 +1,5 @@
-#!/usr/bin/env nix-shell
-#!nix-shell -p curl jq nix -i bash
+#!/usr/bin/env nix
+#!nix shell nixpkgs#curl nixpkgs#jq nixpkgs#nix --command bash
 set -euo pipefail
 
 existing_file="versions.nix"
