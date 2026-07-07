@@ -9,7 +9,7 @@ let
       ...
     }:
     let
-      llvmPackages = prev.llvmPackages_18;
+      llvmPackages = prev.llvmPackages_22;
       inherit (llvmPackages) stdenv;
     in
     stdenv.mkDerivation (finalAttrs: {
