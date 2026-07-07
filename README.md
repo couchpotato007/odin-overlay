@@ -2,6 +2,8 @@
 
 this flake packages the Odin compiler
 
+I tested this only on `x86_64-linux`
+
 ## Usage
 ```nix
 {
