@@ -2,7 +2,7 @@ name: update-odin-versions
 
 on:
   schedule:
-    - cron: "0 6 * * *" # daily 06:00 UTC
+    - cron: 0 20 * * *
   workflow_dispatch: {}
 
 permissions:
