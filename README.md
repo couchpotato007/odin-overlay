@@ -1,6 +1,6 @@
 # Nix Odin flake
 
-this flake packages the Odin compiler as stable and nightly version
+This flake packages the Odin compiler as stable and nightly version
 
 I tested this only on `x86_64-linux`
 
