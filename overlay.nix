@@ -140,8 +140,8 @@ in
     nightly = mkOdin (versions.nightly // { patch = ./patches/nightly-system-raylib.patch; });
   };
   ols-bin = {
-    stable = mkOls (versions.ols-stable // { odin = final.odin; });
+    stable = mkOls (versions.ols-stable // { odin = prev.odin; });
 
-    nightly = mkOls (versions.ols-nightly // { odin = final.odin-bin.nightly; });
+    nightly = mkOls (versions.ols-nightly // { odin = final.odin-bin.stable; });
   };
 }
