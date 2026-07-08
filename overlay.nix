@@ -69,10 +69,79 @@ let
         broken = stdenv.hostPlatform.isMusl;
       };
     });
+
+  mkOls =
+    {
+      rev,
+      sha256,
+      odin,
+      ...
+    }:
+
+    prev.stdenv.mkDerivation (finalAttrs: {
+      pname = "ols";
+      version = "dev-2026-05";
+
+      src = prev.fetchFromGitHub {
+        owner = "DanielGavin";
+        repo = "ols";
+        rev = rev;
+        hash = sha256;
+      };
+
+      postPatch = ''
+        substituteInPlace build.sh \
+          --replace-fail "-microarch:native" ""
+        patchShebangs build.sh odinfmt.sh
+      '';
+
+      nativeBuildInputs = [ prev.makeBinaryWrapper ];
+
+      buildInputs = [
+        odin
+        prev.git
+      ];
+
+      buildPhase = ''
+        runHook preBuild
+
+        ./build.sh && ./odinfmt.sh
+
+        runHook postBuild
+      '';
+
+      installPhase = ''
+        runHook preInstall
+
+        install -Dm755 ols odinfmt -t $out/bin/
+        wrapProgram $out/bin/ols \
+          --set-default ODIN_ROOT ${odin}/share \
+          --set-default OLS_BUILTIN_FOLDER ${odin}/share/base/builtin
+
+        runHook postInstall
+      '';
+
+      meta = {
+        inherit (prev.odin.meta) platforms;
+        description = "Language server for the Odin programming language";
+        homepage = "https://github.com/DanielGavin/ols";
+        license = prev.lib.licenses.mit;
+        maintainers = with prev.lib.maintainers; [
+          astavie
+          atomicptr
+        ];
+        mainProgram = "ols";
+      };
+    });
 in
 {
   odin-bin = {
     stable = mkOdin (versions.stable // { patch = ./patches/stable-system-raylib.patch; });
     nightly = mkOdin (versions.nightly // { patch = ./patches/nightly-system-raylib.patch; });
+  };
+  ols-bin = {
+    stable = mkOls (versions.ols-stable // { odin = final.odin; });
+
+    nightly = mkOls (versions.ols-nightly // { odin = final.odin-bin.nightly; });
   };
 }

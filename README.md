@@ -1,6 +1,6 @@
 # Nix Odin flake
 
-This flake packages the Odin compiler as stable and nightly version
+This flake packages the Odin compiler and ols as stable and nightly version
 
 I tested this only on `x86_64-linux`
 
@@ -38,6 +38,10 @@ currently there is no cache for the compiler but the build time is very short
           odin-bin.stable
           # nightly release
           # odin-bin.nightly
+          # stable release
+          ols-bin.stable
+          # nightly release
+          # ols-bin.nightly
         ];
       };
     };

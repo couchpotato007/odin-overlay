@@ -29,6 +29,8 @@
           default = pkgs.odin-bin.stable;
           odin = pkgs.odin-bin.stable;
           odin-nightly = pkgs.odin-bin.nightly;
+          ols = pkgs.ols-bin.stable;
+          ols-nightly = pkgs.ols-bin.nightly;
         }
       );
     };
