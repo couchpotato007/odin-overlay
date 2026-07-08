@@ -1,12 +1,13 @@
 # Nix Odin flake
 
-this flake packages the Odin compiler
+this flake packages the Odin compiler as stable and nightly version
 
 I tested this only on `x86_64-linux`
 
 currently there is no cache for the compiler but the build time is very short
 
 ## Usage
+
 ```nix
 {
   inputs = {
