@@ -1,0 +1,38 @@
+name: build-odin-versions
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+      - review_requested
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Build odin (stable)
+        run: nix build .#odin -L
+
+      - name: Build odin (nightly)
+        run: nix build .#odin-nightly -L
