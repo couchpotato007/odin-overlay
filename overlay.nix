@@ -1,17 +1,14 @@
-final: prev:
-let
+final: prev: let
   versions = import ./versions.nix;
-  mkOdinStable =
-    {
-      rev,
-      sha256,
-      patch,
-      ...
-    }:
-    let
-      llvmPackages = prev.llvmPackages_18;
-      inherit (llvmPackages) stdenv;
-    in
+  mkOdinStable = {
+    rev,
+    sha256,
+    patch,
+    ...
+  }: let
+    llvmPackages = prev.llvmPackages_18;
+    inherit (llvmPackages) stdenv;
+  in
     stdenv.mkDerivation (finalAttrs: {
       pname = "odin";
       version = rev;
@@ -21,14 +18,14 @@ let
         rev = rev;
         hash = sha256;
       };
-      patches = [ patch ];
+      # patches = [ patch ];
       postPatch = ''
         rm -rf vendor/raylib/{linux,macos,macos-arm64,wasm,windows}
         patchShebangs --build build_odin.sh
       '';
       env.LLVM_CONFIG = prev.lib.getExe' llvmPackages.llvm.dev "llvm-config";
       dontConfigure = true;
-      buildFlags = [ "release" ];
+      buildFlags = ["release"];
 
       nativeBuildInputs = [
         prev.makeBinaryWrapper
@@ -43,16 +40,15 @@ let
         cp -r {base,core,vendor,shared} $out/share
         wrapProgram $out/bin/odin \
           --prefix PATH : ${
-            prev.lib.makeBinPath (
-              with llvmPackages;
-              [
-                bintools
-                llvm
-                clang
-                lld
-              ]
-            )
-          } \
+          prev.lib.makeBinPath (
+            with llvmPackages; [
+              bintools
+              llvm
+              clang
+              lld
+            ]
+          )
+        } \
           --set-default ODIN_ROOT $out/share
         make -C "$out/share/vendor/cgltf/src/"
         make -C "$out/share/vendor/stb/src/"
@@ -70,17 +66,15 @@ let
       };
     });
 
-  mkOdin =
-    {
-      rev,
-      sha256,
-      patch,
-      ...
-    }:
-    let
-      llvmPackages = prev.llvmPackages_18;
-      inherit (llvmPackages) stdenv;
-    in
+  mkOdin = {
+    rev,
+    sha256,
+    patch,
+    ...
+  }: let
+    llvmPackages = prev.llvmPackages_18;
+    inherit (llvmPackages) stdenv;
+  in
     stdenv.mkDerivation (finalAttrs: {
       pname = "odin";
       version = rev;
@@ -90,7 +84,7 @@ let
         rev = rev;
         hash = sha256;
       };
-      patches = [ patch ];
+      # patches = [ patch ];
       postPatch = ''
         rm -rf vendor/raylib/{linux,macos,macos-arm64,wasm,windows}
         patchShebangs --build build_odin.sh
@@ -100,7 +94,7 @@ let
       '';
       env.LLVM_CONFIG = prev.lib.getExe' llvmPackages.llvm.dev "llvm-config";
       dontConfigure = true;
-      buildFlags = [ "release" ];
+      buildFlags = ["release"];
 
       nativeBuildInputs = [
         prev.makeBinaryWrapper
@@ -116,16 +110,15 @@ let
         cp -r {base,core,vendor,shared} $out/share
         wrapProgram $out/bin/odin \
           --prefix PATH : ${
-            prev.lib.makeBinPath (
-              with llvmPackages;
-              [
-                bintools
-                llvm
-                clang
-                lld
-              ]
-            )
-          } \
+          prev.lib.makeBinPath (
+            with llvmPackages; [
+              bintools
+              llvm
+              clang
+              lld
+            ]
+          )
+        } \
           --set-default ODIN_ROOT $out/share
         (cd "$out/share/vendor/cgltf/src/" && ./build_cgltf.sh)
         (cd "$out/share/vendor/stb/src/" && ./build_stb.sh)
@@ -143,14 +136,12 @@ let
       };
     });
 
-  mkOls =
-    {
-      rev,
-      sha256,
-      odin,
-      ...
-    }:
-
+  mkOls = {
+    rev,
+    sha256,
+    odin,
+    ...
+  }:
     prev.stdenv.mkDerivation (finalAttrs: {
       pname = "ols";
       version = "dev-2026-05";
@@ -168,7 +159,7 @@ let
         patchShebangs build.sh odinfmt.sh
       '';
 
-      nativeBuildInputs = [ prev.makeBinaryWrapper ];
+      nativeBuildInputs = [prev.makeBinaryWrapper];
 
       buildInputs = [
         odin
@@ -206,15 +197,14 @@ let
         mainProgram = "ols";
       };
     });
-in
-{
+in {
   odin-bin = {
-    stable = mkOdinStable (versions.stable // { patch = ./patches/stable-system-raylib.patch; });
-    nightly = mkOdin (versions.nightly // { patch = ./patches/nightly-system-raylib.patch; });
+    stable = mkOdinStable (versions.stable // {patch = ./patches/stable-system-raylib.patch;});
+    nightly = mkOdin (versions.nightly // {patch = ./patches/nightly-system-raylib.patch;});
   };
   ols-bin = {
-    stable = mkOls (versions.ols-stable // { odin = prev.odin; });
+    stable = mkOls (versions.ols-stable // {odin = prev.odin;});
 
-    nightly = mkOls (versions.ols-nightly // { odin = final.odin-bin.stable; });
+    nightly = mkOls (versions.ols-nightly // {odin = final.odin-bin.stable;});
   };
 }
