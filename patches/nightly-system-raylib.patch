@@ -1,14 +1,10 @@
 diff --git a/vendor/raylib/raygui.odin b/vendor/raylib/raygui.odin
-index b02fa4438..0d306b292 100644
+index b02fa4438..c59fd77f9 100644
 --- a/vendor/raylib/raygui.odin
 +++ b/vendor/raylib/raygui.odin
-@@ -2,34 +2,8 @@ package raylib
- 
- import "core:c"
- 
--RAYGUI_SHARED :: #config(RAYGUI_SHARED, false)
--RAYGUI_WASM_LIB :: #config(RAYGUI_WASM_LIB, "wasm/libraygui.a")
-+foreign import lib "system:raygui"
+@@ -5,31 +5,9 @@ import "core:c"
+ RAYGUI_SHARED :: #config(RAYGUI_SHARED, false)
+ RAYGUI_WASM_LIB :: #config(RAYGUI_WASM_LIB, "wasm/libraygui.a")
  
 -when ODIN_OS == .Windows {
 -	foreign import lib {
@@ -35,20 +31,20 @@ index b02fa4438..0d306b292 100644
 -} else {
 -	foreign import lib "system:raygui"
 -}
++
++foreign import lib "system:raygui"
++
  
  RAYGUI_VERSION :: "4.0"
  
 diff --git a/vendor/raylib/raylib.odin b/vendor/raylib/raylib.odin
-index 01235b6ec..080114bf2 100644
+index 64321e020..19704adda 100644
 --- a/vendor/raylib/raylib.odin
 +++ b/vendor/raylib/raylib.odin
-@@ -96,56 +96,8 @@ MAX_MATERIAL_MAPS      :: #config(RAYLIB_MAX_MATERIAL_MAPS, 12)
+@@ -99,53 +99,9 @@ MAX_MATERIAL_MAPS      :: #config(RAYLIB_MAX_MATERIAL_MAPS, 12)
+ RAYLIB_SHARED :: #config(RAYLIB_SHARED, false)
+ RAYLIB_WASM_LIB :: #config(RAYLIB_WASM_LIB, "wasm/libraylib.web.a")
  
- #assert(size_of(rune) == size_of(c.int))
- 
--RAYLIB_SHARED :: #config(RAYLIB_SHARED, false)
--RAYLIB_WASM_LIB :: #config(RAYLIB_WASM_LIB, "wasm/libraylib.web.a")
--
 -when ODIN_OS == .Windows {
 -	@(extra_linker_flags="/NODEFAULTLIB:" + ("msvcrt" when RAYLIB_SHARED else "libcmt"))
 -	foreign import lib {
@@ -96,75 +92,9 @@ index 01235b6ec..080114bf2 100644
 -} else {
 -	foreign import lib "system:raylib"
 -}
++
 +foreign import lib "system:raylib"
 +
  
  VERSION_MAJOR :: 6
  VERSION_MINOR :: 0
-diff --git a/vendor/raylib/rlgl/rlgl.odin b/vendor/raylib/rlgl/rlgl.odin
-index 0655a4073..3babf2691 100644
---- a/vendor/raylib/rlgl/rlgl.odin
-+++ b/vendor/raylib/rlgl/rlgl.odin
-@@ -112,60 +112,8 @@ import rl "../."
- 
- VERSION :: "6.0"
- 
--RAYLIB_SHARED :: #config(RAYLIB_SHARED, false)
--RAYLIB_WASM_LIB :: #config(RAYLIB_WASM_LIB, "../wasm/libraylib.web.a")
--
--// Note: We pull in the full raylib library. If you want a truly stand-alone rlgl, then:
--// - Compile a separate rlgl library and use that in the foreign import blocks below.
--// - Remove the `import rl "../."` line
--// - Copy the code from raylib.odin for any types we alias from that package (see PixelFormat etc)
--when ODIN_OS == .Windows {
--	@(extra_linker_flags="/NODEFAULTLIB:" + ("msvcrt" when RAYLIB_SHARED else "libcmt"))
--	foreign import lib {
--		"../windows/raylibdll.lib" when RAYLIB_SHARED else "../windows/raylib.lib" ,
--		"system:Winmm.lib",
--		"system:Gdi32.lib",
--		"system:User32.lib",
--		"system:Shell32.lib",
--	}
--} else when ODIN_OS == .Linux  {
--	when ODIN_ARCH == .arm64 {
--		foreign import lib {
--			// Note(bumbread): I'm not sure why in `linux/` folder there are
--			// multiple copies of raylib.so, but since these bindings are for
--			// particular version of the library, I better specify it. Ideally,
--			// though, it's best specified in terms of major (.so.4)
--			"../linux-arm64/libraylib.so.600" when RAYLIB_SHARED else "../linux-arm64/libraylib.a",
--			"system:dl",
--			"system:pthread",
--			"system:X11",
--		}
--	} else {
--		foreign import lib {
--			// Note(bumbread): I'm not sure why in `linux/` folder there are
--			// multiple copies of raylib.so, but since these bindings are for
--			// particular version of the library, I better specify it. Ideally,
--			// though, it's best specified in terms of major (.so.4)
--			"../linux/libraylib.so.600" when RAYLIB_SHARED else "../linux/libraylib.a",
--			"system:dl",
--			"system:pthread",
--			"system:X11",
--		}
--	}
--} else when ODIN_OS == .Darwin {
--	foreign import lib {
--		"../macos/libraylib.600.dylib" when RAYLIB_SHARED else "../macos/libraylib.a",
--		"system:Cocoa.framework",
--		"system:OpenGL.framework",
--		"system:IOKit.framework",
--	}
--} else when ODIN_ARCH == .wasm32 || ODIN_ARCH == .wasm64p32 {
--	foreign import lib {
--		RAYLIB_WASM_LIB,
--	}
--} else {
--	foreign import lib "system:raylib"
--}
-+foreign import lib "system:raylib"
-+
- 
- GRAPHICS_API_OPENGL_11  :: false
- GRAPHICS_API_OPENGL_21  :: true

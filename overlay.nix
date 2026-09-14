@@ -18,10 +18,13 @@ final: prev: let
         rev = rev;
         hash = sha256;
       };
-      # patches = [ patch ];
+      patches = [patch];
       postPatch = ''
         rm -rf vendor/raylib/{linux,macos,macos-arm64,wasm,windows}
         patchShebangs --build build_odin.sh
+        patchShebangs --build vendor/cgltf/src/build_cgltf.sh
+        patchShebangs --build vendor/stb/src/build_stb.sh
+        patchShebangs --build vendor/miniaudio/src/build_miniaudio.sh
       '';
       env.LLVM_CONFIG = prev.lib.getExe' llvmPackages.llvm.dev "llvm-config";
       dontConfigure = true;
@@ -50,9 +53,9 @@ final: prev: let
           )
         } \
           --set-default ODIN_ROOT $out/share
-        make -C "$out/share/vendor/cgltf/src/"
-        make -C "$out/share/vendor/stb/src/"
-        make -C "$out/share/vendor/miniaudio/src/"
+        (cd "$out/share/vendor/cgltf/src/" && ./build_cgltf.sh)
+        (cd "$out/share/vendor/stb/src/" && ./build_stb.sh)
+        (cd "$out/share/vendor/miniaudio/src/" && ./build_miniaudio.sh)
         runHook postInstall
       '';
 
@@ -84,7 +87,7 @@ final: prev: let
         rev = rev;
         hash = sha256;
       };
-      # patches = [ patch ];
+      patches = [patch];
       postPatch = ''
         rm -rf vendor/raylib/{linux,macos,macos-arm64,wasm,windows}
         patchShebangs --build build_odin.sh
