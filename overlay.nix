@@ -1,164 +1,157 @@
 final: prev: let
-  versions = import ./versions.nix;
-  mkOdinStable = {
-    rev,
-    sha256,
-    patch,
-    ...
-  }: let
-    llvmPackages = prev.llvmPackages_18;
-    inherit (llvmPackages) stdenv;
+  inherit (prev) lib;
+
+  sources = lib.importJSON ./sources.json;
+
+  # First llvmPackages_N from `versions` (preferred first) that still exists in
+  # nixpkgs. Removed versions are throwing aliases, hence the tryEval.
+  pickLlvm = versions: let
+    available = n: let
+      name = "llvmPackages_${toString n}";
+    in
+      prev ? ${name} && (builtins.tryEval prev.${name}).success;
+    found = lib.findFirst available null versions;
   in
-    stdenv.mkDerivation (finalAttrs: {
-      pname = "odin";
-      version = rev;
-      src = prev.fetchFromGitHub {
-        owner = "odin-lang";
-        repo = "Odin";
-        rev = rev;
-        hash = sha256;
-      };
-      patches = [patch];
-      postPatch = ''
-        rm -rf vendor/raylib/{linux,macos,macos-arm64,wasm,windows}
-        patchShebangs --build build_odin.sh
-        patchShebangs --build vendor/cgltf/src/build_cgltf.sh
-        patchShebangs --build vendor/stb/src/build_stb.sh
-        patchShebangs --build vendor/miniaudio/src/build_miniaudio.sh
-      '';
-      env.LLVM_CONFIG = prev.lib.getExe' llvmPackages.llvm.dev "llvm-config";
-      dontConfigure = true;
-      buildFlags = ["release"];
+    if found == null
+    then null
+    else prev."llvmPackages_${toString found}";
 
-      nativeBuildInputs = [
-        prev.makeBinaryWrapper
-        prev.which
-      ];
-
-      installPhase = ''
-        runHook preInstall
-        mkdir -p $out/bin
-        cp odin $out/bin/odin
-        mkdir -p $out/share
-        cp -r {base,core,vendor,shared} $out/share
-        wrapProgram $out/bin/odin \
-          --prefix PATH : ${
-          prev.lib.makeBinPath (
-            with llvmPackages; [
-              bintools
-              llvm
-              clang
-              lld
-            ]
-          )
-        } \
-          --set-default ODIN_ROOT $out/share
-        (cd "$out/share/vendor/cgltf/src/" && ./build_cgltf.sh)
-        (cd "$out/share/vendor/stb/src/" && ./build_stb.sh)
-        (cd "$out/share/vendor/miniaudio/src/" && ./build_miniaudio.sh)
-        runHook postInstall
-      '';
-
-      meta = {
-        description = "Fast, concise, readable, pragmatic and open sourced programming language";
-        homepage = "https://odin-lang.org/";
-        license = prev.lib.licenses.bsd3;
-        mainProgram = "odin";
-        platforms = prev.lib.platforms.unix;
-        broken = stdenv.hostPlatform.isMusl;
-      };
-    });
+  # "dev-2024-05", "dev-2026-11a", "0-unstable-2026-11-03"  ->  "2024-05", ...
+  versionDate = version: let
+    m = builtins.match ".*([0-9]{4}-[0-9]{2}).*" version;
+  in
+    if m == null
+    then "unknown"
+    else builtins.head m;
 
   mkOdin = {
+    version,
     rev,
-    sha256,
-    patch,
+    hash,
+    llvmPackages,
     ...
   }: let
-    llvmPackages = prev.llvmPackages_18;
     inherit (llvmPackages) stdenv;
   in
-    stdenv.mkDerivation (finalAttrs: {
+    stdenv.mkDerivation {
       pname = "odin";
-      version = rev;
+      inherit version;
+
       src = prev.fetchFromGitHub {
         owner = "odin-lang";
         repo = "Odin";
-        rev = rev;
-        hash = sha256;
+        inherit rev hash;
       };
-      patches = [patch];
+
       postPatch = ''
-        rm -rf vendor/raylib/{linux,macos,macos-arm64,wasm,windows}
+        # Use the system raylib/raygui instead of the bundled prebuilt
+        # binaries: GLFW in those tries to dlopen Xlib from FHS paths.
+        # Rewrites every `"(../)linux*/libraylib…"( when X else "…")` style
+        # import to "system:raylib", which works across all Odin versions.
+        find vendor/raylib -name '*.odin' -exec sed -E -i \
+          's#"(\.\./)?(linux|linux-arm64|macos|macos-arm64)/lib(raylib|raygui)[^"]*"( when [A-Za-z_]+ else "[^"]*")?#"system:\3"#g' {} +
+        if grep -rqE '"(\.\./)?(linux|linux-arm64|macos|macos-arm64)/lib' vendor/raylib; then
+          echo "error: unpatched bundled raylib import left in vendor/raylib" >&2
+          grep -rnE '"(\.\./)?(linux|linux-arm64|macos|macos-arm64)/lib' vendor/raylib >&2
+          exit 1
+        fi
+        rm -rf vendor/raylib/{linux,linux-arm64,macos,macos-arm64,windows}
+
+        # Without .git the version would be derived from the build date.
+        substituteInPlace build_odin.sh \
+          --replace-fail '$(date +"%Y-%m")' '${versionDate version}'
+
         patchShebangs --build build_odin.sh
-        patchShebangs --build vendor/cgltf/src/build_cgltf.sh
-        patchShebangs --build vendor/stb/src/build_stb.sh
-        patchShebangs --build vendor/miniaudio/src/build_miniaudio.sh
       '';
-      env.LLVM_CONFIG = prev.lib.getExe' llvmPackages.llvm.dev "llvm-config";
+
+      env.LLVM_CONFIG = lib.getExe' llvmPackages.llvm.dev "llvm-config";
+
       dontConfigure = true;
+
       buildFlags = ["release"];
 
       nativeBuildInputs = [
         prev.makeBinaryWrapper
         prev.which
-        prev.bash
       ];
 
       installPhase = ''
         runHook preInstall
+
         mkdir -p $out/bin
         cp odin $out/bin/odin
+
         mkdir -p $out/share
         cp -r {base,core,vendor,shared} $out/share
+
         wrapProgram $out/bin/odin \
           --prefix PATH : ${
-          prev.lib.makeBinPath (
-            with llvmPackages; [
-              bintools
-              llvm
-              clang
-              lld
-            ]
-          )
+          lib.makeBinPath (with llvmPackages; [
+            bintools
+            llvm
+            clang
+            lld
+          ])
         } \
           --set-default ODIN_ROOT $out/share
-        (cd "$out/share/vendor/cgltf/src/" && ./build_cgltf.sh)
-        (cd "$out/share/vendor/stb/src/" && ./build_stb.sh)
-        (cd "$out/share/vendor/miniaudio/src/" && ./build_miniaudio.sh)
+
+        # Build the bundled C libraries. Older releases ship a Makefile,
+        # newer ones build_*.sh scripts. (vendor/box3d's build.sh also builds
+        # wasm, which the cc-wrapper can't do, so it is skipped like in nixpkgs.)
+        patchShebangs --build $out/share/vendor
+        for src in $out/share/vendor/*/src; do
+          scripts=()
+          for s in "$src"/build_*.sh; do
+            [ -f "$s" ] || continue
+            case "$s" in *android*) continue ;; esac
+            scripts+=("$s")
+          done
+          if [ ''${#scripts[@]} -gt 0 ]; then
+            for s in "''${scripts[@]}"; do
+              echo "building vendor library: $s"
+              (cd "$src" && ODIN_ROOT=$out/share bash "$s")
+            done
+          elif [ -f "$src/Makefile" ]; then
+            echo "building vendor library: $src/Makefile"
+            make -C "$src"
+          fi
+        done
+
         runHook postInstall
       '';
+
+      passthru = {inherit llvmPackages;};
 
       meta = {
         description = "Fast, concise, readable, pragmatic and open sourced programming language";
         homepage = "https://odin-lang.org/";
-        license = prev.lib.licenses.bsd3;
+        license = lib.licenses.zlib;
         mainProgram = "odin";
-        platforms = prev.lib.platforms.unix;
+        platforms = lib.platforms.unix;
         broken = stdenv.hostPlatform.isMusl;
       };
-    });
+    };
 
   mkOls = {
+    version,
     rev,
-    sha256,
+    hash,
     odin,
     ...
   }:
-    prev.stdenv.mkDerivation (finalAttrs: {
+    prev.stdenv.mkDerivation {
       pname = "ols";
-      version = "dev-2026-05";
+      inherit version;
 
       src = prev.fetchFromGitHub {
         owner = "DanielGavin";
         repo = "ols";
-        rev = rev;
-        hash = sha256;
+        inherit rev hash;
       };
 
       postPatch = ''
         substituteInPlace build.sh \
-          --replace-fail "-microarch:native" ""
+          --replace-quiet "-microarch:native" ""
         patchShebangs build.sh odinfmt.sh
       '';
 
@@ -188,26 +181,52 @@ final: prev: let
         runHook postInstall
       '';
 
+      passthru = {inherit odin;};
+
       meta = {
-        inherit (prev.odin.meta) platforms;
+        inherit (odin.meta) platforms;
         description = "Language server for the Odin programming language";
         homepage = "https://github.com/DanielGavin/ols";
-        license = prev.lib.licenses.mit;
-        maintainers = with prev.lib.maintainers; [
-          astavie
-          atomicptr
-        ];
+        license = lib.licenses.mit;
         mainProgram = "ols";
       };
-    });
-in {
-  odin-bin = {
-    stable = mkOdinStable (versions.stable // {patch = ./patches/stable-system-raylib.patch;});
-    nightly = mkOdin (versions.nightly // {patch = ./patches/nightly-system-raylib.patch;});
-  };
-  ols-bin = {
-    stable = mkOls (versions.ols-stable // {odin = prev.odin;});
+    };
 
-    nightly = mkOls (versions.ols-nightly // {odin = final.odin-bin.stable;});
+  # Every source entry whose LLVM requirements nixpkgs can still satisfy.
+  odinVersions = lib.filterAttrs (_: v: v != null) (lib.mapAttrs (
+      _: src: let
+        llvmPackages = pickLlvm (src.llvm or [18]);
+      in
+        if llvmPackages == null
+        then null
+        else mkOdin (src // {inherit llvmPackages;})
+    )
+    sources.odin);
+
+  releaseTags = builtins.filter (n: n != "nightly") (builtins.attrNames odinVersions);
+  # Tags are dev-YYYY-MM[a-z], so lexicographic order is chronological.
+  latestTag = lib.last (lib.sort (a: b: a < b) releaseTags);
+
+  # An ols release often breaks with newer Odin core libraries, so build it
+  # with the newest Odin release from the same month as the ols tag or earlier.
+  odinForOls = olsSrc: let
+    date = versionDate olsSrc.version;
+    older = builtins.filter (t: versionDate t <= date) releaseTags;
+  in
+    odinVersions.${
+      if older == []
+      then latestTag
+      else lib.last (lib.sort (a: b: a < b) older)
+    };
+in {
+  odin-bin =
+    odinVersions
+    // {
+      stable = odinVersions.${latestTag};
+    };
+
+  ols-bin = {
+    stable = mkOls (sources.ols.stable // {odin = odinForOls sources.ols.stable;});
+    nightly = mkOls (sources.ols.nightly // {odin = final.odin-bin.nightly;});
   };
 }

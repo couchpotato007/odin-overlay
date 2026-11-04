@@ -1,15 +1,19 @@
-name: update-odin-versions
+name: build-odin-versions
 
 on:
-  schedule:
-    - cron: 0 20 * * *
-  workflow_dispatch: {}
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  update:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,38 +22,19 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
-
-      - uses: cachix/install-nix-action@v27
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: Update versions.nix
-        run: ./update.sh
-
-      - name: check diff
-        id: diff
-        run: |
-          if git diff --quiet -- versions.nix; then
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          fi
+      - name: Evaluate all packages
+        run: nix flake show --all-systems
 
       - name: Build odin (stable)
-        if: steps.diff.outputs.changed == 'true'
         run: nix build .#odin -L
 
       - name: Build odin (nightly)
-        if: steps.diff.outputs.changed == 'true'
         run: nix build .#odin-nightly -L
 
-      - name: Commit & push
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add versions.nix
-          git commit -m "chore: update odin versions.nix"
-          git push
+      - name: Build ols (stable)
+        run: nix build .#ols -L
+
+      - name: Build ols (nightly)
+        run: nix build .#ols-nightly -L

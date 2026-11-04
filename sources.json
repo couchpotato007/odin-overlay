@@ -1,0 +1,199 @@
+{
+  "odin": {
+    "dev-2026-01": {
+      "version": "dev-2026-01",
+      "rev": "dev-2026-01",
+      "hash": "sha256-YvaEe69YSS/iQeCRyNQrslaY5ZgDW45y0rjb04eYpcw=",
+      "llvm": [
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-02": {
+      "version": "dev-2026-02",
+      "rev": "dev-2026-02",
+      "hash": "sha256-TiXHFFmXzSyENFeTtQoskGrU7oWAHXR7eGgne0w1vEE=",
+      "llvm": [
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-03": {
+      "version": "dev-2026-03",
+      "rev": "dev-2026-03",
+      "hash": "sha256-y9pMArcBlhgEIECqk7I3QsyANUi+XwwFaUvdEG/brWI=",
+      "llvm": [
+        21,
+        20,
+        19,
+        18,
+        17,
+        14
+      ]
+    },
+    "dev-2026-04": {
+      "version": "dev-2026-04",
+      "rev": "dev-2026-04",
+      "hash": "sha256-vUQKXyVKZRLzAPeCileAOIfWXvKLrIjYIHXTdMGnG3k=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17,
+        14
+      ]
+    },
+    "dev-2026-05": {
+      "version": "dev-2026-05",
+      "rev": "dev-2026-05",
+      "hash": "sha256-fgN6Lz1CnUPXrmnQr+sPEfwSF/7y0+eZBX6TKFcFA50=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17,
+        14
+      ]
+    },
+    "dev-2026-06": {
+      "version": "dev-2026-06",
+      "rev": "dev-2026-06",
+      "hash": "sha256-Z2497J80j5OLiyhTumrsofNANnNrnDE6Z3UB1b/TVGg=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17,
+        14
+      ]
+    },
+    "dev-2026-07": {
+      "version": "dev-2026-07",
+      "rev": "dev-2026-07",
+      "hash": "sha256-pVCZB6YOk73tBGVE1i73JJG3z9SZNakFuMp4Kepqnvc=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-07a": {
+      "version": "dev-2026-07a",
+      "rev": "dev-2026-07a",
+      "hash": "sha256-sjL6mj2zfUVpiwkooTTBCVkPRoPWR7ci/hb9TYF+J/I=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-08": {
+      "version": "dev-2026-08",
+      "rev": "dev-2026-08",
+      "hash": "sha256-5w/a3T+NtL6n6oPTjI6RGyBO582nVGR0XJFx1T5J+JA=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-09": {
+      "version": "dev-2026-09",
+      "rev": "dev-2026-09",
+      "hash": "sha256-wJm7J1DU9XxUGrh4AKqHtDJEzxSSVKqOVKWEhckl94Q=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-10": {
+      "version": "dev-2026-10",
+      "rev": "dev-2026-10",
+      "hash": "sha256-Y8Em52W3ntWXgnRiRAyhWv5Y6+3b/4bj2+TTIvtniYU=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-11": {
+      "version": "dev-2026-11",
+      "rev": "dev-2026-11",
+      "hash": "sha256-626+yeBVtfY3Q7AzOY5vtSHSe8mvVDruC2RawzUu+eg=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "dev-2026-11a": {
+      "version": "dev-2026-11a",
+      "rev": "dev-2026-11a",
+      "hash": "sha256-LzvPcA6CA0p9DZi1cuFUizDPkVODMZ0OC9/y+NAO0Kc=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    },
+    "nightly": {
+      "version": "0-unstable-2026-11-03",
+      "rev": "db92c6de3a29bcea0e22cb8f945b9761587f0e00",
+      "hash": "sha256-xgZE9H1uHWbd0J0cnh7Hx+nX5sRZF4+UrD3i0XF4udA=",
+      "llvm": [
+        22,
+        21,
+        20,
+        19,
+        18,
+        17
+      ]
+    }
+  },
+  "ols": {
+    "stable": {
+      "version": "dev-2026-10",
+      "rev": "dev-2026-10",
+      "hash": "sha256-tVg9g5aN4ovUElpDzTSLpTQUq3OEiYUaq3YO98ex8wA="
+    },
+    "nightly": {
+      "version": "0-unstable-2026-11-01",
+      "rev": "9b9711592bed66266311c361dd7a307ecc87025b",
+      "hash": "sha256-D4Dpg9dQXb27zivEsgg/sjukfcfLaZC7XpCpNMMZoe8="
+    }
+  }
+}
