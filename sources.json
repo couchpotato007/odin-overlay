@@ -376,9 +376,9 @@
       ]
     },
     "nightly": {
-      "version": "0-unstable-2026-11-18",
-      "rev": "6a275d863eb31b657cc3b012f426ee41685ffba6",
-      "hash": "sha256-YVImL+FaIjZC5rgicvaAiVU9DtLujx27gts04JQi+4I=",
+      "version": "0-unstable-2026-11-19",
+      "rev": "94ef2a5de5f3340a31f1e08bf62b2f6663a70022",
+      "hash": "sha256-JGil+PXS6YTh1n2G3D8OrpyaCb4ACLSTv5my05z9U64=",
       "llvm": [
         22,
         21,
