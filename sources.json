@@ -376,9 +376,9 @@
       ]
     },
     "nightly": {
-      "version": "0-unstable-2026-11-19",
-      "rev": "94ef2a5de5f3340a31f1e08bf62b2f6663a70022",
-      "hash": "sha256-JGil+PXS6YTh1n2G3D8OrpyaCb4ACLSTv5my05z9U64=",
+      "version": "0-unstable-2026-11-20",
+      "rev": "c42a7c9d5c6dcd5e40741c40e369dc4d5fd40aac",
+      "hash": "sha256-eZvawKdChxadGtUoiZrffptWaLsrGKFP9zZL5QZlX+s=",
       "llvm": [
         22,
         21,
@@ -391,14 +391,14 @@
   },
   "ols": {
     "stable": {
-      "version": "dev-2026-10",
-      "rev": "dev-2026-10",
-      "hash": "sha256-tVg9g5aN4ovUElpDzTSLpTQUq3OEiYUaq3YO98ex8wA="
+      "version": "dev-2026-11",
+      "rev": "dev-2026-11",
+      "hash": "sha256-D4Dpg9dQXb27zivEsgg/sjukfcfLaZC7XpCpNMMZoe8="
     },
     "nightly": {
-      "version": "0-unstable-2026-11-01",
-      "rev": "9b9711592bed66266311c361dd7a307ecc87025b",
-      "hash": "sha256-D4Dpg9dQXb27zivEsgg/sjukfcfLaZC7XpCpNMMZoe8="
+      "version": "0-unstable-2026-11-21",
+      "rev": "50b13fae0619511a9f50dddf4a57febaf2873b01",
+      "hash": "sha256-SelXquZvMeuxcJlSP9E+EnYWzzQM92b7wt6M5hTVC6s="
     }
   }
 }
